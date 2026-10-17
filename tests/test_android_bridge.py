@@ -10,14 +10,15 @@ Verifies:
 
 import hashlib
 import time
+
 import pytest
 
 from osiris_mobile.android_bridge import (
-    NodeAlphaTermuxBridge,
-    AndroidBridgeSecurityError,
+    MAX_OPERATING_TEMP_CELSIUS,
     PROMPT_CONTRACT,
     THERMAL_HORIZON_SECONDS,
-    MAX_OPERATING_TEMP_CELSIUS,
+    AndroidBridgeSecurityError,
+    NodeAlphaTermuxBridge,
 )
 
 
@@ -118,3 +119,20 @@ def test_grant_expired_rejection(bridge):
     with pytest.raises(AndroidBridgeSecurityError) as exc_info:
         bridge.execute_payload(headers, payload, expired_grant, device_temp=35.0)
     assert "ERR_GRANT_EXPIRED" in str(exc_info.value)
+
+
+def test_bridge_requires_explicit_token():
+    with pytest.raises(AndroidBridgeSecurityError):
+        NodeAlphaTermuxBridge(auth_token="")
+    with pytest.raises(TypeError):
+        NodeAlphaTermuxBridge()
+
+
+def test_missing_bearer_prefix_rejected(bridge, valid_grant):
+    headers = {
+        "Authorization": "test-secret-token",
+        "X-Osiris-Prompt-Contract": PROMPT_CONTRACT,
+    }
+    with pytest.raises(AndroidBridgeSecurityError) as exc_info:
+        bridge.execute_payload(headers, b"quantum-ast-payload-bytes", valid_grant, device_temp=35.0)
+    assert "Unauthorized" in str(exc_info.value)

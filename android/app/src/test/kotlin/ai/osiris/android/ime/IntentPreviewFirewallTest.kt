@@ -65,10 +65,25 @@ class IntentPreviewFirewallTest {
 
     @Test
     fun testChainedCommandRejected() {
-        val provenance = firewall.analyzeCommand("/ignite && rm -rf /")
+        // No denylisted token here, so the chaining check (not the denylist) must catch it.
+        val provenance = firewall.analyzeCommand("/ignite && /status")
         assertTrue(provenance is AstProvenance.UnverifiedOrUntrusted)
         val unverified = provenance as AstProvenance.UnverifiedOrUntrusted
         assertTrue(unverified.firewallRejectionReason.contains("multi-statement"))
+    }
+
+    @Test
+    fun testTrailingOperatorRejected() {
+        for (cmd in listOf("/status;", "/ledger |", "/status `")) {
+            val provenance = firewall.analyzeCommand(cmd)
+            assertTrue(cmd, provenance is AstProvenance.UnverifiedOrUntrusted)
+        }
+    }
+
+    @Test
+    fun testQuotedOperatorStillAllowed() {
+        val provenance = firewall.analyzeCommand("/dna \"a; b | c\"")
+        assertTrue(provenance is AstProvenance.VerifiedKernelAst)
     }
 
     @Test

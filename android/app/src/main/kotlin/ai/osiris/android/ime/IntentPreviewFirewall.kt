@@ -125,7 +125,7 @@ class DefaultIntentPreviewFirewall : IntentPreviewFirewall {
         var inSingleQuote = false
         var inDoubleQuote = false
 
-        for (i in 0 until cmd.length - 1) {
+        for (i in cmd.indices) {
             val char = cmd[i]
             if (char == '\'' && (i == 0 || cmd[i - 1] != '\\')) inSingleQuote = !inSingleQuote
             if (char == '"' && (i == 0 || cmd[i - 1] != '\\')) inDoubleQuote = !inDoubleQuote
@@ -156,7 +156,7 @@ class DefaultIntentPreviewFirewall : IntentPreviewFirewall {
                     targetResource = "substrate.crsm.11d",
                     riskLevel = RiskLevel.LOW,
                     modifiesState = false,
-                    description = "Initialize 11D CRSM Substrate & ZeroSum MicroVM with theta_lock=51.843° and Gamma_floor=0.0920"
+                    description = "Start the OSIRIS substrate session; reports component status and design-parameter version only"
                 )
             }
 
@@ -175,7 +175,7 @@ class DefaultIntentPreviewFirewall : IntentPreviewFirewall {
                         riskLevel = RiskLevel.LOW,
                         modifiesState = true,
                         parameters = mapOf("generations" to n.toString()),
-                        description = "Execute zero-backprop autopoietic evolution against Gamma_floor for $n generations"
+                        description = "Run $n generations of zero-backprop autopoietic evolution (no Γ gate until Γ has one registered definition)"
                     )
                 }
             }

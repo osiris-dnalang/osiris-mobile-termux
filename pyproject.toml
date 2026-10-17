@@ -21,6 +21,7 @@ dev = ["pytest>=7.0", "ruff>=0.4.0", "jsonschema>=4.0"]
 
 [project.scripts]
 osiris-mobile = "osiris_mobile.repl:main"
+osiris-ime-bridge = "osiris_mobile.ime.server:main"
 
 [tool.setuptools.packages.find]
 include = ["osiris_mobile*"]

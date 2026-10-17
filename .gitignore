@@ -16,3 +16,7 @@ venv/
 .env
 .env.*
 *.env
+
+# Gradle (android/jvm-check)
+.gradle/
+.kotlin/

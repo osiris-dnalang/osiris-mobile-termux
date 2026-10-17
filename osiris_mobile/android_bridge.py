@@ -10,9 +10,9 @@ Interfaces with Android Kotlin components:
 from __future__ import annotations
 
 import hashlib
+import hmac
 import time
-from typing import Any, Dict, Optional
-
+from typing import Any, Dict
 
 PROMPT_CONTRACT = "osiris::}{> "
 THERMAL_HORIZON_SECONDS = 300.0
@@ -30,7 +30,10 @@ class NodeAlphaTermuxBridge:
     Validates tokens, payload digests, prompt contracts, and temporal horizons.
     """
 
-    def __init__(self, auth_token: str = "node-alpha-local-token"):
+    def __init__(self, auth_token: str):
+        # No default: a token shipped in source is a token every reader of the repo has.
+        if not auth_token:
+            raise AndroidBridgeSecurityError("auth_token is required; there is no built-in default")
         self.auth_token = auth_token
         self.execution_ledger: list[Dict[str, Any]] = []
 
@@ -59,7 +62,8 @@ class NodeAlphaTermuxBridge:
 
         # 3. Authorization token check
         auth_header = headers.get("Authorization", "")
-        if not auth_header.startswith("Bearer ") or auth_header[7:] != self.auth_token:
+        presented = auth_header[7:] if auth_header.startswith("Bearer ") else ""
+        if not hmac.compare_digest(presented.encode("utf-8"), self.auth_token.encode("utf-8")):
             raise AndroidBridgeSecurityError("Unauthorized: invalid or missing bearer token")
 
         # 4. SYS-021 Payload-Grant Binding Check

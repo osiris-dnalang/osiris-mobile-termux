@@ -74,6 +74,22 @@ threshold flaps). `OSIRIS_REQUIRE_PLUGGED=1` gives the strict "or unplugged" rea
 With Termux:API absent the governor fails open; `OSIRIS_POWER_FAIL_OPEN=0` inverts that
 for unattended runs.
 
+## The keyboard bridge
+
+```bash
+osiris-ime-bridge --pair      # once: writes $OSIRIS_HOME/ime/pairing.key (0600), prints it for the keyboard
+osiris-ime-bridge             # serve on 127.0.0.1:8420 (python -m osiris_mobile.ime works too)
+osiris-ime-bridge --verify    # walk the journal's hash chain
+```
+
+The Termux end of the OSIRIS keyboard's second channel: explicit captures become typed,
+redacted, hash-chained nodes; rough intent becomes a delineated prompt for the focused app;
+hinge-spine keys map to an allowlist of idempotent actions. Every request and reply is
+HMAC-signed with the pairing key, because Android's loopback is shared by every app. The
+daemon never calls a model, an API or a shell, and nothing it returns is dispatched until
+the operator taps. Protocol, status and what stays gated:
+[`docs/OSIRIS-IME-INTERCEPTION-001.md`](docs/OSIRIS-IME-INTERCEPTION-001.md).
+
 ## Layout, tiers, and the qiskit question
 
 See [`docs/STRUCTURE.md`](docs/STRUCTURE.md). Short version: `dnalang/qc_ir.py:63` imports

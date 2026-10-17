@@ -35,6 +35,7 @@ jobs:
           python -c "from osiris_mobile.intent import classify; print(classify('auto advance'))"
           python -c "from osiris_mobile.power import Governor; print(Governor())"
           python -c "from osiris_mobile.ladder import load_program; print('ladder ok')"
+          python -c "from osiris_mobile.ime import Bridge, make_server; print('ime bridge ok')"
           python -c "import bench.nclm_harness, bench.livlm_perplexity; print('harnesses import without osiris')"
 
       - name: Shell syntax
@@ -42,6 +43,24 @@ jobs:
 
       - name: Tests
         run: pytest tests/ -v --tb=short
+
+  kotlin-jvm:
+    # The Android app's platform-free Kotlin (ime, security, evidence, substrate), compiled
+    # and unit-tested on the JVM without an Android SDK. bluetooth/ needs a device run and is
+    # excluded; see android/jvm-check/build.gradle.kts.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+      - name: Compile and test
+        working-directory: android/jvm-check
+        run: gradle test --no-daemon
 
   tmux-layout:
     runs-on: ubuntu-latest
